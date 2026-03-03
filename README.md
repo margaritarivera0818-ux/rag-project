@@ -28,3 +28,31 @@ I've examined the Python code thoroughly. The `/test-gemini` endpoint, defined u
 **Confirming Gemini Location**
 
 I've zeroed in on the direct answer: the Gemini call resides within the `test_gemini` function, as we established. I wanted to reiterate this, referencing the provided code snippet to ensure we're on the same page before diving deeper into the README update.
+
+Week 6
+Multiple API Calls to resuse the first responses
+
+@app.get("/test-gemini-chain")
+def test_gemini_chain():
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
+        model = genai.GenerativeModel("gemini-2.5-flash")
+
+        # 1) First call
+        first_prompt = "Explain the importance of clean code in programming."
+        first_response = model.generate_content(first_prompt)
+        first_text = first_response.text
+
+        # 2) Second call, reusing the first response
+        second_prompt = f"Summarize this explanation in one sentence:\n\n{first_text}"
+        second_response = model.generate_content(second_prompt)
+        second_text = second_response.text
+
+        return {
+            "status": "success",
+            "first_response": first_text,
+            "second_response": second_text,
+        }, 200
+
+    except Exception as e:
+        return {"error": f"An error occurred: {e}"}, 500
